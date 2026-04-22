@@ -1,15 +1,6 @@
-<<<<<<< HEAD
 Flask==3.0.3
 requests==2.32.3
 python-docx==1.1.2
 PyPDF2==3.0.1
 openai
 gunicorn
-=======
-Flask==3.0.3
-requests==2.32.3
-python-docx==1.1.2
-PyPDF2==3.0.1
-openai
-gunicorn
->>>>>>> d490cee180814eecf12c3a91283f9c9719b4abe6
