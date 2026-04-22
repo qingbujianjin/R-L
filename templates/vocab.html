@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>生词本</title>
+  <link rel="stylesheet" href="/static/css/themes.css" />
   <style>
     :root {
       --bg: #101820;
@@ -158,10 +159,11 @@
       <h2 style="margin:0;">生词本</h2>
       <div style="display:flex;gap:10px;">
         <select id="themeSelect" class="theme-select">
-          <option value="theme-gatsby">盖茨比之夜</option>
-          <option value="theme-macondo">马孔多回忆</option>
-          <option value="theme-1984">1984 监视之城</option>
-          <option value="theme-pride">傲慢与偏见</option>
+          <option value="nightTender">最后的舞会</option>
+          <option value="aleph">沙之书</option>
+          <option value="furySound">康普生家的午后</option>
+          <option value="castle">土地测量员K</option>
+          <option value="outsider">默尔索的夏天</option>
         </select>
         <a href="/">首页</a>
       </div>
@@ -183,22 +185,46 @@
     <div class="muted" style="margin-top:8px;">支持手机端横向滑动查看完整表格。</div>
   </div>
   <script>
-    const THEME_KEY = "rl-theme";
+    const THEME_KEY = "literary-theme";
+    const OLD_THEME_KEY = "rl-theme";
+    const themeMap = {
+      "theme-gatsby": "nightTender",
+      "theme-macondo": "aleph",
+      "theme-1984": "furySound",
+      "theme-pride": "castle"
+    };
+    const legacyMap = {
+      nightTender: "theme-gatsby",
+      aleph: "theme-macondo",
+      furySound: "theme-1984",
+      castle: "theme-pride",
+      outsider: "theme-gatsby"
+    };
+    function toLiterary(themeValue) {
+      return themeMap[themeValue] || themeValue || "nightTender";
+    }
+    function toLegacy(themeValue) {
+      return legacyMap[themeValue] || themeValue || "theme-gatsby";
+    }
     const tbody = document.getElementById("tbody");
     const empty = document.getElementById("empty");
 
     function applyTheme(themeClass) {
       const body = document.body;
+      const literaryTheme = toLiterary(themeClass);
+      const legacyTheme = toLegacy(themeClass);
       body.classList.remove("theme-gatsby", "theme-macondo", "theme-1984", "theme-pride");
-      body.classList.add(themeClass);
-      localStorage.setItem(THEME_KEY, themeClass);
+      body.classList.add(legacyTheme);
+      body.setAttribute("data-theme", literaryTheme);
+      localStorage.setItem(THEME_KEY, literaryTheme);
+      localStorage.setItem(OLD_THEME_KEY, legacyTheme);
     }
 
     function initThemeSelector() {
       const themeSelect = document.getElementById("themeSelect");
-      const savedTheme = localStorage.getItem(THEME_KEY) || "theme-gatsby";
+      const savedTheme = localStorage.getItem(THEME_KEY) || localStorage.getItem(OLD_THEME_KEY) || "theme-gatsby";
       applyTheme(savedTheme);
-      themeSelect.value = savedTheme;
+      themeSelect.value = toLiterary(savedTheme);
       themeSelect.addEventListener("change", (e) => applyTheme(e.target.value));
     }
 

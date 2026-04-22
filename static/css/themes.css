@@ -1,0 +1,71 @@
+:root {
+  --bg: #101820;
+  --panel: #16212a;
+  --card: #1c2a34;
+  --text: #c5a059;
+  --muted: #9ca3af;
+  --primary: #009b77;
+  --border: #2b3a44;
+  --link: #8ecae6;
+}
+
+/* Night Tender / Gatsby */
+body.theme-gatsby,
+body[data-theme="nightTender"] {
+  --bg: #191970;
+  --panel: #121244;
+  --card: #1c2a34;
+  --text: #f7e7ce;
+  --muted: #d7c6ac;
+  --primary: #ff00ff;
+  --border: rgba(247, 231, 206, 0.7);
+}
+
+/* Aleph / Macondo legacy slot */
+body.theme-macondo,
+body[data-theme="aleph"] {
+  --bg: #000000;
+  --panel: #0b0b0b;
+  --card: #111111;
+  --text: #ffffff;
+  --muted: #d7d7d7;
+  --primary: #8a2be2;
+  --border: rgba(255, 255, 255, 0.55);
+  --link: #00f5ff;
+}
+
+/* Fury / 1984 legacy slot */
+body.theme-1984,
+body[data-theme="furySound"] {
+  --bg: #808080;
+  --panel: #6e6e6e;
+  --card: #7a7a7a;
+  --text: #1a1a1a;
+  --muted: #2a2a2a;
+  --primary: #ffff00;
+  --border: #1a1a1a;
+}
+
+/* Castle / Pride legacy slot */
+body.theme-pride,
+body[data-theme="castle"] {
+  --bg: #7f8c8d;
+  --panel: #556b6b;
+  --card: #5f7475;
+  --text: #f4efe8;
+  --muted: #d8d0c5;
+  --primary: #2f4f4f;
+  --border: rgba(244, 239, 232, 0.35);
+}
+
+/* Outsider can be enabled by data-theme only */
+body[data-theme="outsider"] {
+  --bg: #ffffff;
+  --panel: #f8f8f8;
+  --card: #f2f2f2;
+  --text: #111111;
+  --muted: #3d3d3d;
+  --primary: #ff4500;
+  --border: #111111;
+  --link: #32cd32;
+}

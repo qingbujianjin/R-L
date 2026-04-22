@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ book_title }} - 阅读</title>
+  <link rel="stylesheet" href="/static/css/themes.css" />
   <style>
     :root {
       --bg: #101820;
@@ -180,10 +181,11 @@
     }
     .word-token {
       cursor: pointer;
-      border-bottom: 1px dashed var(--token-border);
+      border-bottom: 0;
       transition: 0.15s;
     }
     .word-token:hover {
+      border-bottom: 1px dashed var(--token-hover);
       color: var(--token-hover);
       border-bottom-color: var(--token-hover);
     }
@@ -375,6 +377,8 @@
       let selectedText = "";
       let currentMeaning = "";
       const knownWords = new Set();
+      const definitionCache = new Map();
+      const inflightDefinition = new Map();
       const validWordRegex = /^[A-Za-z]{2,32}$/;
       const sentenceRegex = /[A-Za-z]{2,}.*\s+[A-Za-z]{2,}/;
       analyzeBtn.style.display = "none";
@@ -436,8 +440,26 @@
           setAddButtonState(false);
           return;
         }
+        if (definitionCache.has(word)) {
+          currentMeaning = definitionCache.get(word);
+          menuMeaning.textContent = currentMeaning;
+          await checkWordAdded(word);
+          return;
+        }
+        if (inflightDefinition.has(word)) {
+          menuMeaning.textContent = "查询中...";
+          try {
+            await inflightDefinition.get(word);
+          } catch (err) {
+            // 忽略并走下方统一文案
+          }
+          currentMeaning = definitionCache.get(word) || "未找到释义";
+          menuMeaning.textContent = currentMeaning;
+          return;
+        }
         await checkWordAdded(word);
-        try {
+        const task = (async () => {
+          try {
           const res = await fetch("/api/ai-translate", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -459,10 +481,18 @@
             return;
           }
           currentMeaning = `${meaningCn}\n\n${meaningEn}${example ? `\n\n例句: ${example}` : ""}`.trim();
+          definitionCache.set(word, currentMeaning);
           menuMeaning.textContent = currentMeaning;
-        } catch (err) {
+          } catch (err) {
           currentMeaning = "无法联网查询，请检查网络设置";
           menuMeaning.textContent = currentMeaning;
+          }
+        })();
+        inflightDefinition.set(word, task);
+        try {
+          await task;
+        } finally {
+          inflightDefinition.delete(word);
         }
       }
 
@@ -679,10 +709,27 @@
     }
 
     (function applySavedTheme() {
-      const key = "rl-theme";
-      const saved = localStorage.getItem(key) || "theme-gatsby";
+      const literaryKey = "literary-theme";
+      const legacyKey = "rl-theme";
+      const themeMap = {
+        "theme-gatsby": "nightTender",
+        "theme-macondo": "aleph",
+        "theme-1984": "furySound",
+        "theme-pride": "castle"
+      };
+      const legacyMap = {
+        nightTender: "theme-gatsby",
+        aleph: "theme-macondo",
+        furySound: "theme-1984",
+        castle: "theme-pride",
+        outsider: "theme-gatsby"
+      };
+      const rawTheme = localStorage.getItem(literaryKey) || localStorage.getItem(legacyKey) || "theme-gatsby";
+      const literaryTheme = themeMap[rawTheme] || rawTheme || "nightTender";
+      const legacyTheme = legacyMap[rawTheme] || rawTheme || "theme-gatsby";
       document.body.classList.remove("theme-gatsby", "theme-macondo", "theme-1984", "theme-pride");
-      document.body.classList.add(saved);
+      document.body.classList.add(legacyTheme);
+      document.body.setAttribute("data-theme", literaryTheme);
     })();
 
     setupSelectionStudyMenu();

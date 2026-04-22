@@ -3,10 +3,12 @@ import os
 import uuid
 import sqlite3
 import urllib.parse
+import time
+import re
 from datetime import datetime
 
 import requests
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, send_from_directory
 from openai import OpenAI
 
 app = Flask(__name__)
@@ -16,6 +18,9 @@ DB_PATH = os.path.join(BASE_DIR, "books.db")
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 OFFICIAL_DIR = os.path.join(UPLOAD_DIR, "official")
 ALLOWED_UPLOAD_EXTENSIONS = {".txt", ".docx", ".pdf"}
+WORD_PATTERN = re.compile(r"^[A-Za-z]{2,32}$")
+AI_TRANSLATE_CACHE = {}
+AI_CACHE_TTL_SECONDS = 24 * 60 * 60
 
 
 def load_local_env_file():
@@ -100,7 +105,7 @@ def get_deepseek_client():
     return OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
 
 
-def deepseek_chat(messages, temperature=0.2):
+def deepseek_chat(messages, temperature=0.2, timeout_seconds=12):
     client = get_deepseek_client()
     if not client:
         raise RuntimeError("DEEPSEEK_API_KEY 未配置")
@@ -108,6 +113,7 @@ def deepseek_chat(messages, temperature=0.2):
         model="deepseek-chat",
         messages=messages,
         temperature=temperature,
+        timeout=timeout_seconds,
     )
     if not resp or not resp.choices or not resp.choices[0].message:
         return ""
@@ -166,6 +172,33 @@ def parse_uploaded_book(file_path):
                 chunks.append(txt)
         return "\n\n".join(chunks).strip()
     raise ValueError("unsupported file type")
+
+
+def normalize_reader_text(text):
+    """阅读展示前再做一层轻清洗，减少古腾堡排版噪音。"""
+    import re
+
+    content = (text or "").replace("\r\n", "\n")
+    # 去掉斜体标记下划线与花括号索引
+    content = content.replace("_", "")
+    content = re.sub(r"\{[^\}]+\}", "", content)
+    # 去掉常见插图标记/残留行
+    content = re.sub(r"(?im)^.*\[(?:Illustration|Image):[^\]]*\].*\n?", "", content)
+    content = re.sub(r"(?im)^[ \t]*(?:illustration|image|plate|fig\.?|figure)\b[^\n]*\n?", "", content)
+    # 去掉仅由方括号组成的空残片
+    content = re.sub(r"(?m)^[ \t]*[\[\]][ \t]*$", "", content)
+    # 清理每行前导空白（保留最多1个空格，避免错位排版）
+    lines = []
+    for line in content.split("\n"):
+        stripped = line.lstrip()
+        if not stripped:
+            lines.append("")
+        else:
+            lines.append(stripped)
+    content = "\n".join(lines)
+    # 压缩连续空行
+    content = re.sub(r"\n{3,}", "\n\n", content).strip()
+    return content
 
 
 def mock_search(q):
@@ -389,7 +422,8 @@ def api_book(book_id):
     conn.close()
     if not row:
         return jsonify({"error": "book not found"}), 404
-    return jsonify({"title": row["title"] or row["original_filename"], "content": row["content_text"] or ""})
+    cleaned = normalize_reader_text(row["content_text"] or "")
+    return jsonify({"title": row["title"] or row["original_filename"], "content": cleaned})
 
 
 @app.route("/api/ai-translate", methods=["POST"])
@@ -398,6 +432,14 @@ def ai_translate():
     user_text = (data.get("word") or data.get("sentence") or "").strip()
     if not user_text:
         return jsonify({"error": "word 不能为空"}), 400
+    normalized = user_text.lower()
+    now = int(time.time())
+    # 只对正常英文单词走缓存；短句保持实时
+    if WORD_PATTERN.match(user_text):
+        cached = AI_TRANSLATE_CACHE.get(normalized)
+        if cached and now - cached["ts"] <= AI_CACHE_TTL_SECONDS:
+            return jsonify(cached["data"])
+
     prompt = (
         "你是一个专业的英语助教。请解释用户输入的单词或句子，"
         "返回 JSON，字段为 meaning_cn、meaning_en、example。"
@@ -409,16 +451,26 @@ def ai_translate():
                 {"role": "user", "content": user_text},
             ],
             temperature=0.2,
+            timeout_seconds=8,
         )
         parsed = extract_json_from_text(content)
-        return jsonify(
-            {
-                "meaning_cn": parsed.get("meaning_cn", "未返回中文释义"),
-                "meaning_en": parsed.get("meaning_en", "未返回英文释义"),
-                "example": parsed.get("example", "未返回例句"),
-            }
-        )
+        result = {
+            "meaning_cn": parsed.get("meaning_cn", "未返回中文释义"),
+            "meaning_en": parsed.get("meaning_en", "未返回英文释义"),
+            "example": parsed.get("example", "未返回例句"),
+        }
+        if WORD_PATTERN.match(user_text):
+            AI_TRANSLATE_CACHE[normalized] = {"ts": now, "data": result}
+        return jsonify(result)
     except Exception as exc:
+        # 快速降级，避免前端长时间等待
+        if WORD_PATTERN.match(user_text):
+            fallback = {
+                "meaning_cn": f"{user_text}（离线简释）",
+                "meaning_en": "",
+                "example": "",
+            }
+            return jsonify(fallback)
         return jsonify({"error": f"AI 翻译失败: {exc}"}), 500
 
 
@@ -643,6 +695,16 @@ def upload():
     book_id = cur.lastrowid
     conn.close()
     return jsonify({"book_id": book_id, "title": original})
+
+
+@app.route("/themes")
+def themes_page():
+    return send_from_directory(os.path.join(BASE_DIR, "static", "themes"), "index.html")
+
+
+@app.route("/themes/<path:path>")
+def themes_assets(path):
+    return send_from_directory(os.path.join(BASE_DIR, "static", "themes"), path)
 
 
 if __name__ == "__main__":

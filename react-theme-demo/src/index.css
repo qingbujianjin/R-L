@@ -1,0 +1,289 @@
+@import url("https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@200;300;400;600;700&family=Merriweather:wght@300;700&family=Permanent+Marker&family=Playfair+Display:wght@500;700&family=Space+Grotesk:wght@400;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #191970;
+  --bg-secondary: #121244;
+  --text-primary: #f7e7ce;
+  --text-muted: #d7c6ac;
+  --accent-primary: #ff00ff;
+  --accent-secondary: #f7e7ce;
+  --border-color: rgba(247, 231, 206, 0.8);
+  --card-shadow: 0 12px 36px rgba(255, 0, 255, 0.18);
+  --grain-opacity: 0.12;
+  --cursor-color: #ff00ff;
+  --font-heading: "Playfair Display", serif;
+  --font-body: "Inter", "Noto Sans SC", sans-serif;
+  --panel-radius: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  font-family: var(--font-body);
+  transition: background-color 0.45s ease, color 0.45s ease;
+  cursor: crosshair;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: var(--grain-opacity);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.12) 0.7px, transparent 0.7px);
+  background-size: 3px 3px;
+}
+
+/* Night-themed floating golden particles */
+body::after {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(circle at 15% 15%, rgba(247, 231, 206, 0.28), transparent 28%),
+    radial-gradient(circle at 70% 25%, rgba(247, 231, 206, 0.17), transparent 24%),
+    radial-gradient(circle at 30% 75%, rgba(247, 231, 206, 0.14), transparent 26%);
+  animation: drift 22s linear infinite;
+  opacity: 0.55;
+}
+
+@keyframes drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-2%, 2%, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+main,
+.theme-card,
+header {
+  position: relative;
+  z-index: 1;
+}
+
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 10px;
+}
+
+.display-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 2vw + 1.2rem, 3rem);
+  line-height: 1.1;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.theme-card {
+  grid-column: span 12;
+  padding: 1.1rem 1.2rem 1.3rem;
+  background: color-mix(in oklab, var(--bg-secondary) 85%, black 15%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(5px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+@media (min-width: 960px) {
+  .theme-card:nth-child(1) {
+    grid-column: span 5;
+  }
+  .theme-card:nth-child(2) {
+    grid-column: span 4;
+  }
+  .theme-card:nth-child(3) {
+    grid-column: span 3;
+  }
+  .aleph-layout .theme-card:nth-child(1) {
+    grid-column: 2 / span 6;
+  }
+  .aleph-layout .theme-card:nth-child(2) {
+    grid-column: 8 / span 4;
+    transform: translateY(24px);
+  }
+  .aleph-layout .theme-card:nth-child(3) {
+    grid-column: 1 / span 4;
+  }
+}
+
+.card-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.35rem, 1.4vw + 0.9rem, 2rem);
+  margin: 0 0 10px;
+}
+
+.card-body,
+.list {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.theme-btn {
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 0.56rem 1rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.theme-btn-primary {
+  background: var(--accent-primary);
+  color: #111;
+  box-shadow: 0 0 14px color-mix(in oklab, var(--accent-primary) 65%, transparent 35%);
+}
+
+.theme-btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.theme-select {
+  min-width: 170px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 0.52rem 0.8rem;
+}
+
+.collage {
+  box-shadow: var(--card-shadow), 0 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.empty-state {
+  min-height: 220px;
+}
+
+.outsider-empty {
+  background-image: linear-gradient(18deg, rgba(255, 69, 0, 0.07), rgba(50, 205, 50, 0.05));
+}
+
+/* Rough hand-drawn stickman for outsider empty state */
+.matchman {
+  position: relative;
+  width: 82px;
+  height: 120px;
+  margin-top: 10px;
+}
+
+.matchman span {
+  position: absolute;
+  display: block;
+  background: var(--text-primary);
+  border-radius: 999px;
+}
+
+.matchman .head {
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--text-primary);
+  background: transparent;
+  left: 30px;
+  top: 0;
+}
+
+.matchman .body {
+  width: 4px;
+  height: 46px;
+  left: 39px;
+  top: 24px;
+}
+
+.matchman .arm {
+  width: 30px;
+  height: 3px;
+  top: 44px;
+}
+
+.matchman .arm.left {
+  left: 10px;
+  transform: rotate(12deg);
+}
+
+.matchman .arm.right {
+  right: 10px;
+  transform: rotate(-11deg);
+}
+
+.matchman .leg {
+  width: 28px;
+  height: 3px;
+  top: 78px;
+}
+
+.matchman .leg.left {
+  left: 14px;
+  transform: rotate(28deg);
+}
+
+.matchman .leg.right {
+  right: 14px;
+  transform: rotate(-28deg);
+}
+
+/* Aleph holographic edge and kaleidoscope-ish glow */
+body[data-theme="aleph"] .theme-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(138, 43, 226, 0.1), rgba(0, 245, 255, 0.08));
+}
+
+body[data-theme="aleph"] .theme-card:hover {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4), 0 0 26px rgba(138, 43, 226, 0.5), 0 0 42px rgba(0, 245, 255, 0.3);
+}
+
+/* Fury: brutalist overlap and rough edge */
+body[data-theme="furySound"] .display-title {
+  text-shadow: -2px 2px 0 #ffff00, 2px -2px 0 #8b0000;
+}
+
+body[data-theme="furySound"] .theme-card {
+  border-width: 2px;
+  border-style: dashed;
+}
+
+/* Castle: heavier mist */
+body[data-theme="castle"] .theme-card {
+  background: rgba(47, 79, 79, 0.46);
+  backdrop-filter: blur(7px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

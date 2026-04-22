@@ -4,3 +4,5 @@ __pycache__/
 books.db
 uploads/
 *.log
+react-theme-demo/node_modules/
+react-theme-demo/dist/
