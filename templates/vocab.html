@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -284,3 +285,265 @@
   </script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>生词本</title>
+  <style>
+    :root {
+      --bg: #101820;
+      --panel: #16212a;
+      --text: #C5A059;
+      --muted: #9ca3af;
+      --border: #2b3a44;
+      --primary: #009B77;
+      --danger: #ef4444;
+      --link: #8ecae6;
+      --table-bg: #111827;
+      --table-head-bg: #1f2937;
+      --row-border: #2d3748;
+      --table-head-text: #cbd5e1;
+      --danger-border: #7f1d1d;
+      --danger-text: #ffffff;
+    }
+    body.theme-gatsby {
+      --bg: #101820;
+      --panel: #16212a;
+      --text: #C5A059;
+      --muted: #9ca3af;
+      --border: #2b3a44;
+      --primary: #009B77;
+    }
+    body.theme-macondo {
+      --bg: #F0E6D2;
+      --panel: #eadfc8;
+      --text: #2B2B2B;
+      --muted: #6b6256;
+      --border: #d4c8ae;
+      --primary: #F2C94C;
+      --link: #7c5c2a;
+      --table-bg: #f3e8d2;
+      --table-head-bg: #e8dbc3;
+      --row-border: #d8cab1;
+      --table-head-text: #3f362b;
+      --danger-border: #a66a45;
+      --danger-text: #2b2b2b;
+    }
+    body.theme-1984 {
+      --bg: #2C2C2C;
+      --panel: #363636;
+      --text: #E0E0E0;
+      --muted: #b3b3b3;
+      --border: #4a4a4a;
+      --primary: #FF3333;
+      --link: #ff7b7b;
+      --table-bg: #313131;
+      --table-head-bg: #3b3b3b;
+      --row-border: #4a4a4a;
+      --table-head-text: #e5e5e5;
+      --danger-border: #9f3a3a;
+      --danger-text: #f2f2f2;
+    }
+    body.theme-pride {
+      --bg: #FDFBF7;
+      --panel: #f7f3ec;
+      --text: #1A4D2E;
+      --muted: #5f6f65;
+      --border: #ddcfc0;
+      --primary: #E29587;
+      --link: #1a4d2e;
+      --table-bg: #f8f1e7;
+      --table-head-bg: #eee4d7;
+      --row-border: #dfd2c3;
+      --table-head-text: #355142;
+      --danger-border: #b77870;
+      --danger-text: #1a4d2e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .topbar a {
+      color: var(--link);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .theme-select {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 620px;
+      background: var(--table-bg);
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid var(--row-border);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+    th { color: var(--table-head-text); background: var(--table-head-bg); }
+    .muted { color: var(--muted); font-size: 13px; }
+    .delete-btn {
+      border: 1px solid var(--danger-border);
+      background: var(--danger);
+      color: var(--danger-text);
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    #empty {
+      color: var(--muted);
+      padding: 14px 6px 4px;
+      display: none;
+    }
+    @media (max-width: 700px) {
+      body { padding: 12px; }
+      .container { padding: 12px; }
+      th, td { font-size: 13px; padding: 8px; }
+    }
+  </style>
+</head>
+<body class="theme-gatsby">
+  <div class="container">
+    <div class="topbar">
+      <h2 style="margin:0;">生词本</h2>
+      <div style="display:flex;gap:10px;">
+        <select id="themeSelect" class="theme-select">
+          <option value="theme-gatsby">盖茨比之夜</option>
+          <option value="theme-macondo">马孔多回忆</option>
+          <option value="theme-1984">1984 监视之城</option>
+          <option value="theme-pride">傲慢与偏见</option>
+        </select>
+        <a href="/">首页</a>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 22%;">单词</th>
+            <th>释义</th>
+            <th style="width: 22%;">添加时间</th>
+            <th style="width: 90px;">操作</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div id="empty">暂时没有生词，去阅读页面划词加入吧。</div>
+    <div class="muted" style="margin-top:8px;">支持手机端横向滑动查看完整表格。</div>
+  </div>
+  <script>
+    const THEME_KEY = "rl-theme";
+    const tbody = document.getElementById("tbody");
+    const empty = document.getElementById("empty");
+
+    function applyTheme(themeClass) {
+      const body = document.body;
+      body.classList.remove("theme-gatsby", "theme-macondo", "theme-1984", "theme-pride");
+      body.classList.add(themeClass);
+      localStorage.setItem(THEME_KEY, themeClass);
+    }
+
+    function initThemeSelector() {
+      const themeSelect = document.getElementById("themeSelect");
+      const savedTheme = localStorage.getItem(THEME_KEY) || "theme-gatsby";
+      applyTheme(savedTheme);
+      themeSelect.value = savedTheme;
+      themeSelect.addEventListener("change", (e) => applyTheme(e.target.value));
+    }
+
+    function esc(str) {
+      return String(str || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    async function loadVocab() {
+      try {
+        const res = await fetch("/get_vocab");
+        const list = await res.json();
+        renderRows(list || []);
+      } catch (err) {
+        tbody.innerHTML = "<tr><td colspan='4'>加载失败</td></tr>";
+      }
+    }
+
+    function renderRows(list) {
+      if (!list.length) {
+        tbody.innerHTML = "";
+        empty.style.display = "block";
+        return;
+      }
+      empty.style.display = "none";
+      tbody.innerHTML = list.map((item) => `
+        <tr>
+          <td><strong>${esc(item.word)}</strong></td>
+          <td>${esc(item.meaning)}</td>
+          <td>${esc(item.added_at || "-")}</td>
+          <td><button class="delete-btn" data-id="${item.id}">删除</button></td>
+        </tr>
+      `).join("");
+    }
+
+    tbody.addEventListener("click", async (e) => {
+      const btn = e.target.closest("button.delete-btn");
+      if (!btn) return;
+      const id = btn.getAttribute("data-id");
+      if (!id) return;
+      if (!confirm("确认删除该生词吗？")) return;
+      try {
+        const res = await fetch(`/delete_vocab/${id}`, { method: "DELETE" });
+        if (!res.ok) throw new Error("删除失败");
+        await loadVocab();
+      } catch (err) {
+        alert("删除失败，请重试");
+      }
+    });
+
+    initThemeSelector();
+    loadVocab();
+  </script>
+</body>
+</html>
+>>>>>>> d490cee180814eecf12c3a91283f9c9719b4abe6
